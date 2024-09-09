@@ -28,4 +28,5 @@ public class Constants {
     public static final String USER_NOT_LEGAL = "El usuario a registrar debe de ser mayor de edad.";
     public static final String USER_PHONE_NOT_VALID = "El numero de celular no sigue el formato +57 o 3xx, y debe ser unicamente numerico.";
     public static final String USER_NOT_FOUND = "No se encontró el usuario solicitado.";
+    public static final String USER_EMAIL_OR_PASSWORD_INCORRECT = "El correo electronico o la contraseña son incorrectas";
 }

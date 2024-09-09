@@ -54,4 +54,18 @@ public class UserControllerAdvisor {
         );
     }
 
+    @ExceptionHandler(UserIncorrectPasswordException.class)
+    public ResponseEntity<ExceptionResponse> handleUserIncorrectPasswordException(UserIncorrectPasswordException ex) {
+        return ResponseEntity.badRequest().body(
+                new ExceptionResponse(Constants.USER_EMAIL_OR_PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now())
+        );
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex) {
+        return ResponseEntity.badRequest().body(
+                new ExceptionResponse(Constants.USER_EMAIL_OR_PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now())
+        );
+    }
+
 }

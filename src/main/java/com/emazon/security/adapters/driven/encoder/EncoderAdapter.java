@@ -15,7 +15,7 @@ public class EncoderAdapter implements IEncoderPort {
     }
 
     @Override
-    public boolean matches(String text) {
-        return false;
+    public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

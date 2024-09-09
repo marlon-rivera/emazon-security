@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class UserUseCaseImpl implements IUserServicePort {
@@ -34,6 +35,19 @@ public class UserUseCaseImpl implements IUserServicePort {
         }
         user.setPassword(encoderPort.encode(user.getPassword()));
         return userPersistencePort.saveUser(user);
+    }
+
+    @Override
+    public Auth loginUser(String email, String password) {
+        Optional<User> userOptional = userPersistencePort.getUserByEmail(email);
+        if(userOptional.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        User user = userOptional.get();
+        if(!encoderPort.matches(password, user.getPassword())) {
+            throw new UserIncorrectPasswordException();
+        }
+        return userPersistencePort.loginUser(email, password);
     }
 
     private void validatePhone(String phone){

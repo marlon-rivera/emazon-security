@@ -134,4 +134,37 @@ class UserUseCaseImplTest {
         user.setPassword("password");
         assertThrows(UserIdNotValidOnlyNumericException.class, () -> userUseCase.saveUser(user));
     }
+
+    @Test
+    void loginUser_ShouldThrowUserNotFoundException_WhenUserDoesNotExist() {
+        when(userPersistencePort.getUserByEmail("test@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userUseCase.loginUser("test@example.com", "password123"));
+    }
+
+    @Test
+    void loginUser_ShouldThrowUserIncorrectPasswordException_WhenPasswordIsIncorrect() {
+        User user = new User();
+        user.setPassword("encodedPassword");
+
+        when(userPersistencePort.getUserByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(encoderPort.matches("password123", user.getPassword())).thenReturn(false);
+
+        assertThrows(UserIncorrectPasswordException.class, () -> userUseCase.loginUser("test@example.com", "password123"));
+    }
+
+    @Test
+    void loginUser_ShouldReturnAuth_WhenLoginIsSuccessful() {
+        User user = new User();
+        user.setPassword("encodedPassword");
+        Auth auth = new Auth("token");
+
+        when(userPersistencePort.getUserByEmail("test@example.com")).thenReturn(Optional.of(user));
+        when(encoderPort.matches("password123", user.getPassword())).thenReturn(true);
+        when(userPersistencePort.loginUser("test@example.com", "password123")).thenReturn(auth);
+
+        Auth result = userUseCase.loginUser("test@example.com", "password123");
+
+        assertEquals(auth, result);
+    }
 }

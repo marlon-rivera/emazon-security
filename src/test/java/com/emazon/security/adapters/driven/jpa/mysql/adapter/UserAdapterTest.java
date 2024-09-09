@@ -6,6 +6,7 @@ import com.emazon.security.adapters.driven.jpa.mysql.repository.IUserRepository;
 import com.emazon.security.domain.model.Auth;
 import com.emazon.security.domain.model.RoleEnum;
 import com.emazon.security.domain.model.User;
+import com.emazon.security.domain.spi.IAuthenticationPort;
 import com.emazon.security.domain.spi.IJwtPort;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,8 +17,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class UserAdapterTest {
 
@@ -30,6 +31,9 @@ class UserAdapterTest {
     @Mock
     private IJwtPort jwtPort;
 
+    @Mock
+    private IAuthenticationPort authenticationPort;
+
     @InjectMocks
     private UserAdapter userAdapter;
 
@@ -40,11 +44,11 @@ class UserAdapterTest {
 
     @Test
     void testSaveUser() {
-        User user = new User(); // Configura el usuario como necesites
+        User user = new User();
         user.setEmail("test@example.com");
         user.setRole(RoleEnum.ADMIN);
 
-        UserEntity userEntity = new UserEntity(); // Configura el UserEntity como necesites
+        UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@example.com");
         userEntity.setRole(RoleEnum.ADMIN);
 
@@ -59,10 +63,10 @@ class UserAdapterTest {
 
     @Test
     void testGetUserByEmail() {
-        UserEntity userEntity = new UserEntity(); // Configura el UserEntity como necesites
+        UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@example.com");
 
-        User user = new User(); // Configura el User como necesites
+        User user = new User();
         user.setEmail("test@example.com");
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(userEntity));
@@ -76,10 +80,10 @@ class UserAdapterTest {
     @Test
     void testGetUserById() {
         String userId = "123";
-        UserEntity userEntity = new UserEntity(); // Configura el UserEntity como necesites
+        UserEntity userEntity = new UserEntity();
         userEntity.setId(userId);
 
-        User user = new User(); // Configura el User como necesites
+        User user = new User();
         user.setId(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
@@ -88,5 +92,29 @@ class UserAdapterTest {
         Optional<User> result = userAdapter.getUserById(userId);
 
         assertEquals(Optional.of(user), result);
+    }
+
+    @Test
+    void loginUser_ShouldReturnAuth_WhenLoginIsSuccessful() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setEmail("test@example.com");
+        userEntity.setRole(RoleEnum.ADMIN);
+
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(userEntity));
+        when(jwtPort.getToken(userEntity.getEmail(), userEntity.getRole().name())).thenReturn("jwtToken");
+
+        Auth auth = userAdapter.loginUser("test@example.com", "password");
+
+        assertNotNull(auth);
+        assertEquals("jwtToken", auth.getToken());
+        verify (authenticationPort, times(1)).authenticate("test@example.com", "password");
+    }
+
+    @Test
+    void loginUser_ShouldThrowException_WhenAuthenticationFails() {
+        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> userAdapter.loginUser("test@example.com", "password"));
+        verify(authenticationPort, times(1)).authenticate(anyString(), anyString());
     }
 }

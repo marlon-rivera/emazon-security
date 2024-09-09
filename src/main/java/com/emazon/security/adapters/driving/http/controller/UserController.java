@@ -1,5 +1,6 @@
 package com.emazon.security.adapters.driving.http.controller;
 
+import com.emazon.security.adapters.driving.http.dto.request.LoginRequest;
 import com.emazon.security.adapters.driving.http.dto.request.UserRequest;
 import com.emazon.security.adapters.driving.http.dto.response.AuthResponse;
 import com.emazon.security.adapters.driving.http.mapper.request.IUserRequestMapper;
@@ -32,6 +33,31 @@ public class UserController {
     public ResponseEntity<AuthResponse> register(@Valid
                                              @RequestBody UserRequest userRequest){
         return ResponseEntity.status(HttpStatus.CREATED).body(userResponseMapper.toAuthResponse(userService.saveUser(userRequestMapper.toUser(userRequest))));
+    }
+
+    @Operation(
+            summary = "Login a user",
+            description = "This endpoint allows a user to log in."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "User logged in successfully.",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = AuthResponse.class)
+            )
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Invalid login credentials",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = ExceptionResponse.class)
+            )
+    )
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest){
+        return ResponseEntity.status(HttpStatus.OK).body(userResponseMapper.toAuthResponse(userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword())));
     }
 
 }
