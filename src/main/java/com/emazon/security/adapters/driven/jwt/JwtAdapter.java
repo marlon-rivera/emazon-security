@@ -10,7 +10,7 @@ public class JwtAdapter implements IJwtPort {
     private final JwtService jwtService;
 
     @Override
-    public String getToken(String email, String role) {
-        return jwtService.getToken(email, role);
+    public String getToken(String id, String role) {
+        return jwtService.getToken(id, role);
     }
 }

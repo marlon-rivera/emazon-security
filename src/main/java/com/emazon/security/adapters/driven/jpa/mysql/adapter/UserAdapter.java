@@ -23,7 +23,7 @@ public class UserAdapter implements IUserPersistencePort {
     @Override
     public Auth saveUser(User user) {
         UserEntity userEntity = userRepository.save(userEntityMapper.toUserEntity(user));
-        return new Auth(jwtPort.getToken(userEntity.getEmail(), userEntity.getRole().name()));
+        return new Auth(jwtPort.getToken(userEntity.getId(), userEntity.getRole().name()));
     }
 
     @Override
@@ -38,9 +38,9 @@ public class UserAdapter implements IUserPersistencePort {
 
     @Override
     public Auth loginUser(String email, String password) {
-        authenticationPort.authenticate(email, password);
         UserEntity userEntity = userRepository.findByEmail(email).orElseThrow();
-        return new Auth(jwtPort.getToken(userEntity.getEmail(), userEntity.getRole().name()));
+        authenticationPort.authenticate(userEntity.getId(), password);
+        return new Auth(jwtPort.getToken(userEntity.getId(), userEntity.getRole().name()));
 
     }
 }

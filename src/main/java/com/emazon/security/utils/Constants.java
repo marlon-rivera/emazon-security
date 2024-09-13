@@ -17,8 +17,10 @@ public class Constants {
     public static final String EMAIL_VALID_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     public static final String PHONE_START_PREFIX = "+57";
     public static final String ROLE_SECURITY_PREFIX = "ROLE_";
+    public static final String ROLE_PREFIX = "ROLE";
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final int MIN_CHARACTERS_PHONE = 10;
+    public static final String EMAIL = "email";
     public static final int MIN_AGE = 18;
 
     //EXCEPTIONS

@@ -50,11 +50,12 @@ class UserAdapterTest {
 
         UserEntity userEntity = new UserEntity();
         userEntity.setEmail("test@example.com");
+        userEntity.setId("123");
         userEntity.setRole(RoleEnum.ADMIN);
 
         when(userEntityMapper.toUserEntity(user)).thenReturn(userEntity);
         when(userRepository.save(userEntity)).thenReturn(userEntity);
-        when(jwtPort.getToken(userEntity.getEmail(), userEntity.getRole().name())).thenReturn("jwtToken");
+        when(jwtPort.getToken(userEntity.getId(), userEntity.getRole().name())).thenReturn("jwtToken");
 
         Auth auth = userAdapter.saveUser(user);
 
@@ -97,24 +98,25 @@ class UserAdapterTest {
     @Test
     void loginUser_ShouldReturnAuth_WhenLoginIsSuccessful() {
         UserEntity userEntity = new UserEntity();
+        userEntity.setId("123");
         userEntity.setEmail("test@example.com");
         userEntity.setRole(RoleEnum.ADMIN);
 
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(userEntity));
-        when(jwtPort.getToken(userEntity.getEmail(), userEntity.getRole().name())).thenReturn("jwtToken");
+        when(jwtPort.getToken(userEntity.getId(), userEntity.getRole().name())).thenReturn("jwtToken");
 
         Auth auth = userAdapter.loginUser("test@example.com", "password");
 
         assertNotNull(auth);
         assertEquals("jwtToken", auth.getToken());
-        verify (authenticationPort, times(1)).authenticate("test@example.com", "password");
+            verify (authenticationPort, times(1)).authenticate("123", "password");
     }
 
     @Test
     void loginUser_ShouldThrowException_WhenAuthenticationFails() {
-        when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findById("123")).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> userAdapter.loginUser("test@example.com", "password"));
-        verify(authenticationPort, times(1)).authenticate(anyString(), anyString());
+        verify(authenticationPort, times(0)).authenticate("123", "password");
     }
 }

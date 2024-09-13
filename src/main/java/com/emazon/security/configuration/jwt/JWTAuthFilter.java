@@ -20,7 +20,8 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class JWTAuthFilter extends OncePerRequestFilter {
+public class
+JWTAuthFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -28,20 +29,20 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String token = getTokenFromRequest(request);
-        final String email;
+        final String username;
         if(token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-        email = jwtService.getEmailFromToken(token);
-        if(email != null && SecurityContextHolder.getContext().getAuthentication() == null){
-           authenticate(email, token, request);
+        username = jwtService.getSubjectFromToken(token);
+        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+           authenticate(username, token, request);
         }
         filterChain.doFilter(request, response);
     }
 
-    private void authenticate(String email, String token, HttpServletRequest request) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    private void authenticate(String username, String token, HttpServletRequest request) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         if(jwtService.isTokenValid(token, userDetails)){
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails,

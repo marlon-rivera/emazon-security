@@ -1,5 +1,6 @@
 package com.emazon.security.configuration.jwt;
 
+import com.emazon.security.utils.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -19,17 +20,17 @@ public class JwtService{
 
     private static final String SECRET_KEY = "CDFVGBHNJKLOIUYGVRET6789IUJHGFDERT567UJHGFDSCVBGHNJKLLLLLLLLLLLLLLLLJHGFDCVBNM";
 
-    public String getToken(String email, String role) {
+    public String getToken(String id, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("ROLE", role);
-        return getToken(claims, email);
+        claims.put(Constants.ROLE_PREFIX, role);
+        return getToken(claims, id);
     }
 
-    private String getToken(Map<String, Object> claims, String email) {
+    private String getToken(Map<String, Object> claims, String id) {
         return Jwts
                 .builder()
                 .setClaims(claims)
-                .setSubject(email)
+                .setSubject(id)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
@@ -42,13 +43,13 @@ public class JwtService{
 
     }
 
-    public String getEmailFromToken(String token) {
+    public String getSubjectFromToken(String token) {
         return getClaim(token, Claims::getSubject);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String email = getEmailFromToken(token);
-        return email.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        final String subject = getSubjectFromToken(token);
+        return subject.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     private Claims getClaimsFromToken(String token) {
