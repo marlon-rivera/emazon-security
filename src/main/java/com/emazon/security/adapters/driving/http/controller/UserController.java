@@ -26,13 +26,22 @@ public class UserController {
     private final IUserRequestMapper userRequestMapper;
     private final IUserResponseMapper userResponseMapper;
 
-    @Operation(summary = "Create a new user", description = "This endpoint allows you to create a new user.")
+    @Operation(summary = "Create a new client", description = "This endpoint allows you to create a new client.")
     @ApiResponse(responseCode = "200", description = "User created correctly.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Incorrect user creation request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))})
+    @ApiResponse(responseCode = "400", description = "Incorrect client creation request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))})
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid
                                              @RequestBody UserRequest userRequest){
-        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseMapper.toAuthResponse(userService.saveUser(userRequestMapper.toUser(userRequest))));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseMapper.toAuthResponse(userService.saveClient(userRequestMapper.toUser(userRequest))));
+    }
+
+    @Operation(summary = "Create a new warehouse assistant", description = "This endpoint allows you to create a new warehouse assistant.")
+    @ApiResponse(responseCode = "200", description = "warehouse assistant created correctly.", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuthResponse.class)))
+    @ApiResponse(responseCode = "400", description = "Incorrect warehouse assistant creation request", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ExceptionResponse.class))})
+    @PostMapping("/registerWarehouse")
+    public ResponseEntity<AuthResponse> registerWarehouse(@Valid
+                                                 @RequestBody UserRequest userRequest){
+        return ResponseEntity.status(HttpStatus.CREATED).body(userResponseMapper.toAuthResponse(userService.saveWarehouseAssistant(userRequestMapper.toUser(userRequest))));
     }
 
     @Operation(

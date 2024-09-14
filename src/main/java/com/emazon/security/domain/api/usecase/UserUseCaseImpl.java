@@ -3,6 +3,7 @@ package com.emazon.security.domain.api.usecase;
 import com.emazon.security.domain.api.IUserServicePort;
 import com.emazon.security.domain.exception.*;
 import com.emazon.security.domain.model.Auth;
+import com.emazon.security.domain.model.RoleEnum;
 import com.emazon.security.domain.model.User;
 import com.emazon.security.domain.spi.IEncoderPort;
 import com.emazon.security.domain.spi.IUserPersistencePort;
@@ -19,8 +20,7 @@ public class UserUseCaseImpl implements IUserServicePort {
     private final IUserPersistencePort userPersistencePort;
     private final IEncoderPort encoderPort;
 
-    @Override
-    public Auth saveUser(User user) {
+    private Auth saveUser(User user) {
         validateId(user.getId());
         validateEmail(user.getEmail());
         validatePhone(user.getPhone());
@@ -35,6 +35,18 @@ public class UserUseCaseImpl implements IUserServicePort {
         }
         user.setPassword(encoderPort.encode(user.getPassword()));
         return userPersistencePort.saveUser(user);
+    }
+
+    @Override
+    public Auth saveClient(User user) {
+        user.setRole(RoleEnum.USER);
+        return saveUser(user);
+    }
+
+    @Override
+    public Auth saveWarehouseAssistant(User user) {
+        user.setRole(RoleEnum.WAREHOUSE_MANAGER);
+        return saveUser(user);
     }
 
     @Override

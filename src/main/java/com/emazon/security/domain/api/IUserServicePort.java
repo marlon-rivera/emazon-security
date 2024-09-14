@@ -5,7 +5,8 @@ import com.emazon.security.domain.model.User;
 
 public interface IUserServicePort {
 
-    Auth saveUser(User user);
+    Auth saveClient(User user);
+    Auth saveWarehouseAssistant(User user);
     Auth loginUser(String email, String password);
 
 }

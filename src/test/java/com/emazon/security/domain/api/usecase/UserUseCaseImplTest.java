@@ -47,7 +47,27 @@ class UserUseCaseImplTest {
         when(encoderPort.encode(user.getPassword())).thenReturn("encodedPassword");
         when(userPersistencePort.saveUser(user)).thenReturn(new Auth("jwtToken"));
 
-        Auth auth = userUseCase.saveUser(user);
+        Auth auth = userUseCase.saveClient(user);
+
+        assertNotNull(auth);
+        assertEquals("jwtToken", auth.getToken());
+    }
+
+    @Test
+    void testSaveUser_ValidWarehouseAssistant() {
+        User user = new User();
+        user.setId("123");
+        user.setEmail("test@example.com");
+        user.setPhone("+573214567894");
+        user.setBirthDate(LocalDate.of(2000, 1, 1));
+        user.setPassword("password");
+
+        when(userPersistencePort.getUserByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userPersistencePort.getUserById(user.getId())).thenReturn(Optional.empty());
+        when(encoderPort.encode(user.getPassword())).thenReturn("encodedPassword");
+        when(userPersistencePort.saveUser(user)).thenReturn(new Auth("jwtToken"));
+
+        Auth auth = userUseCase.saveWarehouseAssistant(user);
 
         assertNotNull(auth);
         assertEquals("jwtToken", auth.getToken());
@@ -64,7 +84,7 @@ class UserUseCaseImplTest {
 
         when(userPersistencePort.getUserByEmail(user.getEmail())).thenReturn(Optional.of(new User()));
 
-        UserEmailAlreadyUsedException thrown = assertThrows(UserEmailAlreadyUsedException.class, () -> userUseCase.saveUser(user));
+        UserEmailAlreadyUsedException thrown = assertThrows(UserEmailAlreadyUsedException.class, () -> userUseCase.saveClient(user));
         assertNotNull(thrown);
     }
 
@@ -80,7 +100,7 @@ class UserUseCaseImplTest {
         when(userPersistencePort.getUserByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(userPersistencePort.getUserById(user.getId())).thenReturn(Optional.of(new User()));
 
-        UserIdAlreadyUsedException thrown = assertThrows(UserIdAlreadyUsedException.class, () -> userUseCase.saveUser(user));
+        UserIdAlreadyUsedException thrown = assertThrows(UserIdAlreadyUsedException.class, () -> userUseCase.saveClient(user));
         assertNotNull(thrown);
     }
 
@@ -96,7 +116,7 @@ class UserUseCaseImplTest {
         when(userPersistencePort.getUserByEmail(user.getEmail())).thenReturn(Optional.empty());
         when(userPersistencePort.getUserById(user.getId())).thenReturn(Optional.empty());
 
-        UserNotLegalAgeException thrown = assertThrows(UserNotLegalAgeException.class, () -> userUseCase.saveUser(user));
+        UserNotLegalAgeException thrown = assertThrows(UserNotLegalAgeException.class, () -> userUseCase.saveClient(user));
         assertNotNull(thrown);
     }
 
@@ -108,9 +128,9 @@ class UserUseCaseImplTest {
         user.setPhone("54567894");
         user.setBirthDate(LocalDate.of(2000, 1, 1));
         user.setPassword("password");
-        assertThrows(UserPhoneNotValidException.class, () -> userUseCase.saveUser(user));
+        assertThrows(UserPhoneNotValidException.class, () -> userUseCase.saveClient(user));
         user.setPhone("a12343a");
-        assertThrows(UserPhoneNotValidException.class, () -> userUseCase.saveUser(user));
+        assertThrows(UserPhoneNotValidException.class, () -> userUseCase.saveClient(user));
     }
 
     @Test
@@ -121,7 +141,7 @@ class UserUseCaseImplTest {
         user.setPhone("+573214567894");
         user.setBirthDate(LocalDate.of(2000, 1, 1));
         user.setPassword("password");
-        assertThrows(UserEmailNotValidException.class, () -> userUseCase.saveUser(user));
+        assertThrows(UserEmailNotValidException.class, () -> userUseCase.saveClient(user));
     }
 
     @Test
@@ -132,7 +152,7 @@ class UserUseCaseImplTest {
         user.setPhone("+573214567894");
         user.setBirthDate(LocalDate.of(2000, 1, 1));
         user.setPassword("password");
-        assertThrows(UserIdNotValidOnlyNumericException.class, () -> userUseCase.saveUser(user));
+        assertThrows(UserIdNotValidOnlyNumericException.class, () -> userUseCase.saveClient(user));
     }
 
     @Test

@@ -67,12 +67,11 @@ class UserControllerTest {
     void testRegister() throws Exception {
         UserRequest userRequest = new UserRequest(
                 BigInteger.valueOf(1093L), "test", "test", "+573507310045",
-                LocalDate.of(2000, 1, 1), "user@user.com", "user123", RoleEnum.USER
-        );
+                LocalDate.of(2000, 1, 1), "user@user.com", "user123");
         AuthResponse authResponse = new AuthResponse("token");
 
         when(userRequestMapper.toUser(any(UserRequest.class))).thenReturn(new User());
-        when(userService.saveUser(any(User.class))).thenReturn(new Auth("token"));
+        when(userService.saveClient(any(User.class))).thenReturn(new Auth("token"));
         when(userResponseMapper.toAuthResponse(any(Auth.class))).thenReturn(authResponse);
 
         mockMvc.perform(post("/user/register")
@@ -80,6 +79,23 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(userRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.token").value("token"));
+    }
+
+    @Test
+    void testRegisterWarehouse() throws Exception {
+        UserRequest userRequest = new UserRequest(
+                BigInteger.valueOf(1093L), "test", "test", "+573507310045",
+                LocalDate.of(2000, 1, 1), "user@user.com", "user123");
+        AuthResponse authResponse = new AuthResponse("token");
+
+        when(userRequestMapper.toUser(any(UserRequest.class))).thenReturn(new User());
+        when(userService.saveClient(any(User.class))).thenReturn(new Auth("token"));
+        when(userResponseMapper.toAuthResponse(any(Auth.class))).thenReturn(authResponse);
+
+        mockMvc.perform(post("/user/registerWarehouse")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userRequest)))
+                .andExpect(status().isCreated());
     }
 
     @Test

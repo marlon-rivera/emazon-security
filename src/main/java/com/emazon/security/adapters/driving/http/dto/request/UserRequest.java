@@ -34,7 +34,5 @@ public class UserRequest {
     private String email;
     @NotEmpty(message = Constants.PASSWORD_USER_BLANK)
     private String password;
-    @NotNull(message = Constants.ROLE_USER_BLANK)
-    private RoleEnum role;
 
 }

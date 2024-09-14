@@ -109,7 +109,7 @@ class UserAdapterTest {
 
         assertNotNull(auth);
         assertEquals("jwtToken", auth.getToken());
-            verify (authenticationPort, times(1)).authenticate("123", "password");
+        verify (authenticationPort, times(1)).authenticate("123", "password");
     }
 
     @Test
